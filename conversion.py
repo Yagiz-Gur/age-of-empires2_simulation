@@ -9,7 +9,7 @@ clock = pygame.time.Clock()
 
 #define scale and max,min Speed
 scale=35  
-MAX_SPEED=10
+MAX_SPEED=5
 pygame.font.init()
 TEXT_FONT = pygame.font.SysFont("Arial",35)
 #Spawn Setting
@@ -50,7 +50,12 @@ class HUSKARL(pygame.sprite.Sprite):
         self.collide()
 
     def collide(self):
-        pygame.sprite.spritecollide(self,game.bowman_group,True)
+        if (pygame.sprite.spritecollide(self,game.bowman_group,False)):
+            collide_items = pygame.sprite.spritecollide(self,game.bowman_group,True)
+            print("ss")
+            print(collide_items[0].x,collide_items[0].y)
+            rext = pygame.Rect(collide_items[0].rect.x,collide_items[0].rect.y,55,55)
+            pygame.draw.rect(screen,(255,0,0),rext)
     
     def draw_huskarl(self):
         screen.blit(self.huskarl_img,self.rect)
@@ -166,7 +171,7 @@ class MAIN:
         self.huskarl_group = pygame.sprite.Group()
         self.teutonic_group = pygame.sprite.Group()
 
-        for i in range(50):
+        for i in range(5):
             bowman = BOWMAN()
             self.bowman_group.add(bowman)
             
@@ -232,9 +237,9 @@ class MAIN:
             screen.blit(background_img,(0,0))
 
             self.bowman_group.update()
-            self.huskarl_group.update()
+            
             self.teutonic_group.update()
-
+            self.huskarl_group.update()
             self.win_check()
 
             clock.tick(60)
