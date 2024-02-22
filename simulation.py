@@ -52,6 +52,7 @@ class HUSKARL(pygame.sprite.Sprite):
         self.check_border()
         self.draw_huskarl()
         self.collide()
+        self.chase()
 
     def collide(self):
         pygame.sprite.spritecollide(self,game.bowman_group,True)
@@ -71,7 +72,14 @@ class HUSKARL(pygame.sprite.Sprite):
         #check horizanta border
         if self.rect.y+SCALE> HEIGHT or self.rect.y< 0:
             self.velocity_y= self.velocity_y*-1
-        
+
+    def chase(self):
+        if len(game.bowman_group.sprites()) !=0:
+            enemy = min([e for e in game.bowman_group.sprites()], key=lambda e: pow(e.rect.x - self.rect.x, 2) + pow(e.rect.y-self.rect.y, 2))
+            pygame.draw.line(SCREEN,(255,0,0),(self.rect.x,self.rect.y), (enemy.rect.x,enemy.rect.y))
+            self.velocity_x = ((enemy.rect.x - self.rect.x)/(abs((enemy.rect.x - self.rect.x))+0.1))* random.randint(1,MAX_SPEED)
+            self.velocity_y = ((enemy.rect.y - self.rect.y)/(abs((enemy.rect.y - self.rect.y))+0.1))* random.randint(1,MAX_SPEED)
+
 class BOWMAN(pygame.sprite.Sprite):   
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -97,6 +105,7 @@ class BOWMAN(pygame.sprite.Sprite):
         self.check_border()
         self.draw_bowman()
         self.collide()
+        self.chase()
     
     def draw_bowman(self):
         SCREEN.blit(self.bowman_img,self.rect)       
@@ -113,7 +122,13 @@ class BOWMAN(pygame.sprite.Sprite):
         #check horizanta border
         if self.rect.y+SCALE> HEIGHT or self.rect.y< 0:
             self.velocity_y= self.velocity_y*-1
-    
+    def chase(self):
+        if len(game.teutonic_group.sprites()) !=0:
+            enemy = min([e for e in game.teutonic_group.sprites()], key=lambda e: pow(e.rect.x - self.rect.x, 2) + pow(e.rect.y-self.rect.y, 2))
+            pygame.draw.line(SCREEN,(255,0,0),(self.rect.x,self.rect.y), (enemy.rect.x,enemy.rect.y))
+            self.velocity_x = ((enemy.rect.x - self.rect.x)/(abs((enemy.rect.x - self.rect.x))+0.1))* random.randint(1,MAX_SPEED)
+            self.velocity_y = ((enemy.rect.y - self.rect.y)/(abs((enemy.rect.y - self.rect.y))+0.1))* random.randint(1,MAX_SPEED)
+ 
 class TEUTONIC(pygame.sprite.Sprite):
     def __init__ (self):
         pygame.sprite.Sprite.__init__(self)
@@ -128,12 +143,13 @@ class TEUTONIC(pygame.sprite.Sprite):
 
         self.velocity_x = random.randint(1,MAX_SPEED)* random.choice([-1,1])
         self.velocity_y = random.randint(1,MAX_SPEED) * random.choice([-1,1])
-
+    
     def update(self):
         self.move()
         self.check_border()
         self.draw_teutonic()
         self.collision()
+        self.chase()
 
     def collision(self):
         pygame.sprite.spritecollide(self,game.huskarl_group,True)
@@ -150,6 +166,14 @@ class TEUTONIC(pygame.sprite.Sprite):
 
     def draw_teutonic(self):
         SCREEN.blit(self.teutonic_img,self.rect)
+    
+    def chase(self):
+        # !!!! ADD -> Check whether game.bowman_groups is empty or not
+        if len(game.huskarl_group.sprites())!= 0:
+            enemy = min([e for e in game.huskarl_group.sprites()], key=lambda e: pow(e.rect.x - self.rect.x, 2) + pow(e.rect.y-self.rect.y, 2))
+            pygame.draw.line(SCREEN,(255,0,0),(self.rect.x,self.rect.y), (enemy.rect.x,enemy.rect.y))
+            self.velocity_x = ((enemy.rect.x - self.rect.x)/(abs((enemy.rect.x - self.rect.x))+0.1))* random.randint(1,MAX_SPEED)
+            self.velocity_y = ((enemy.rect.y - self.rect.y)/(abs((enemy.rect.y - self.rect.y))+0.1))* random.randint(1,MAX_SPEED)
 
 class MAIN:
     def __init__(self):
@@ -252,6 +276,7 @@ class MAIN:
 
             #Background and Winner text        
             SCREEN.fill((125,125,125))
+            self.check_event()
 
             #show winner image
             # !!!!!!!!!!!!!!! Fix img load part !!!!!!!!!
@@ -280,6 +305,12 @@ class MAIN:
             self.back2menu.draw()
             self.exit_button = Button(WİDTH/10,HEIGHT/10+150,185,80,"Exit")
             self.exit_button.draw()
+
+            if self.back2menu.is_clicked():
+                self.main_menu()
+            if self.exit_button.is_clicked():
+                pygame.quit()
+                sys.exit()
 
             SCREEN.blit(self.winner_img, img_rectangle)
 
