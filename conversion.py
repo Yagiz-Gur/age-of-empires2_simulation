@@ -1,11 +1,20 @@
 import pygame,sys,random
 
+"""
+    Todo: Add Game Pause
+    Todo: FIX the Menu's Button
+    Todo: Add Game Prefrances (Conversion : ON/OFF) (Follow: ON/OFF)
+    Todo: Add Game Options 
+    Todo: Add Eat Music 
+    TODO: Add Top Banner Contains Number of Character & Time % Sound On/Off % Stop/Play
 
+"""
 pygame.init()
 WİDTH = 1280
 HEIGHT = 720
 SCREEN = pygame.display.set_mode((WİDTH,HEIGHT))
 clock = pygame.time.Clock()
+
 
 #define SCALE and max,min Speed
 SCALE=35  
@@ -161,6 +170,8 @@ class MAIN:
         self.SCALE= 35
         self.text_font =pygame.font.SysFont("Arial",45)
 
+        self.pause = False
+
     
     def win_check(self):
         if len(self.huskarl_group.sprites())==0 and len(self.bowman_group.sprites())==0 :
@@ -199,22 +210,22 @@ class MAIN:
                 pygame.quit()
                 sys.exit()
             
+            # Mouse button
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
-            
-        # check collision
-        # Check play button            
-        if self.play_button.rect.collidepoint(mx,my):
-            self.play_button.clicked()
-            if click:                
-                self.game_loop()
-
-        if self.exit_button.rect.collidepoint(mx,my):
-            self.exit_button.clicked()
-            if click:
-                pygame.quit()
-                sys.exit()
+            # Keyboard key
+            if event.type == pygame.KEYDOWN:
+                #Escape
+                if event.key == pygame.K_ESCAPE:
+                    if self.pause:
+                        self.pause= False
+                        print("paused")
+                    else:
+                        self.pause = True
+                        print("as")
+                
+        
             
     def main_menu(self):
         menu_bg = pygame.image.load("Graphics/Backgrounds/menu_bg.jpg").convert()
@@ -226,8 +237,23 @@ class MAIN:
             self.play_button = Button(WİDTH/2,(HEIGHT/2)-90,150,80,"Start",text_color=(250,250,250))
             self.play_button.draw()
 
-            self.exit_button = Button((WİDTH/2),(HEIGHT/2),150,80,"Exit",(0,26,58))
+            self.exit_button = Button((WİDTH/2),(HEIGHT/2),150,80,"Exit",(255,255,255))
             self.exit_button.draw()
+
+
+            # check collision
+                        
+            # Check play button            
+            if self.play_button.rect.collidepoint(mx,my):
+                self.play_button.clicked()
+                if click:                
+                    self.game_loop()
+            
+            if self.exit_button.rect.collidepoint(mx,my):
+                self.exit_button.clicked()
+                if click:
+                    pygame.quit()
+                    sys.exit()
 
             self.check_event()
 
@@ -237,21 +263,31 @@ class MAIN:
                             
         
     def game_loop(self):
+        
         self.add_sprites()
+        
         while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-            
-            # SCREEN.fill()
-            SCREEN.blit(background_img,(0,0))
+            self.check_event()
+            if self.pause:
+                
+                # self.pause_menu()
+                # surfuce = pygame.Surface((WİDTH,HEIGHT), pygame.SRCALPHA)
+                # surfuce.fill((20,0,0,150))
+                # pygame.draw.rect(surfuce, (125,110,130,150),[(0,0),(WİDTH/2,HEIGHT/2)])
+                # SCREEN.blit(surfuce,(0,0))
 
-            self.bowman_group.update()
-            self.huskarl_group.update()
-            self.teutonic_group.update()
+                
+                print("paused")
 
-            self.win_check()
+
+            else:
+                
+                SCREEN.blit(background_img,(0,0))
+                self.bowman_group.update()
+                self.huskarl_group.update()
+                self.teutonic_group.update()
+
+                self.win_check()
 
             clock.tick(60)
             pygame.display.update()
@@ -296,6 +332,12 @@ class MAIN:
             pygame.display.update()
             clock.tick(60)
 
+    def pause_menu(self):
+        #* PAUSE MENU
+        #! change name etc. 
+        pass
+        
+        
 
 
 class Button:
@@ -313,7 +355,6 @@ class Button:
         self.text_rect= self.text.get_rect(center=(x,y))
 
     def draw(self):
-
         #draw button
         SCREEN.blit(self.default_button,self.rect)
         SCREEN.blit(self.text,self.text_rect)

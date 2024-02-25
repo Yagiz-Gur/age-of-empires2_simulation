@@ -80,6 +80,8 @@ class HUSKARL(pygame.sprite.Sprite):
             self.velocity_x = ((enemy.rect.x - self.rect.x)/(abs((enemy.rect.x - self.rect.x))+0.1))* random.randint(1,MAX_SPEED)
             self.velocity_y = ((enemy.rect.y - self.rect.y)/(abs((enemy.rect.y - self.rect.y))+0.1))* random.randint(1,MAX_SPEED)
 
+
+
 class BOWMAN(pygame.sprite.Sprite):   
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -179,8 +181,8 @@ class MAIN:
     def __init__(self):
         self.SCALE= 35
         self.text_font =pygame.font.SysFont("Arial",45)
+        self.paused = False
 
-    
     def win_check(self):
         if len(self.huskarl_group.sprites())==0 and len(self.bowman_group.sprites())==0 :
             self.win_state("Teutonic")
@@ -205,7 +207,7 @@ class MAIN:
             self.teutonic_group.add(teutonic)
 
 
-    def check_event(self):
+    def main_win_events(self):
 
         #mouse pos
         
@@ -222,27 +224,60 @@ class MAIN:
                 if event.button == 1:
                     self.click = True
             
-       
-        # check collision
-        # Check play button            
+               
+    def game_loop_event(self):
 
+        #mouse pos
+        self.Mx, self.My = pygame.mouse.get_pos()
+        self.click=False
+
+        
+        # check interaction 
+        for event in pygame.event.get():
+            # Quit 
+            if event.type ==pygame.QUIT:
+                pygame.quit()
+                sys.exit()
             
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    self.click = True
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    if self.paused:
+                        print("cont")
+                        self.paused=False 
+                    else:
+                        self.paused =True
+                        self.pause_menu()
     def main_menu(self):
         menu_bg = pygame.image.load("Graphics/Backgrounds/menu_bg.jpg").convert()
         menu_bg = pygame.transform.scale(menu_bg,(WİDTH,HEIGHT))
         while True:
              
             SCREEN.blit(menu_bg,(0,0))
-            self.check_event()
+            self.main_win_events()
+            # -- Set button
+            # Play Button
             self.play_button = Button(WİDTH/2,(HEIGHT/2)-90,150,80,"Start",text_color=(250,250,250))
             self.play_button.draw()
-            if (self.play_button.is_clicked()):
-                self.game_loop()
-
+            
+            #Exit button
             self.exit_button = Button((WİDTH/2),(HEIGHT/2),150,80,"Exit",(0,26,58))
             self.exit_button.draw()
 
+            #Options
             
+
+            # -- Set button action
+
+            #play button
+            if (self.play_button.is_clicked()):
+                self.game_loop()
+            #exit button
+            if self.exit_button.is_clicked():
+                pygame.quit()
+                sys.exit()
 
 
             clock.tick(60)
@@ -252,19 +287,21 @@ class MAIN:
     def game_loop(self):
         self.add_sprites()
         while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-            
-            # SCREEN.fill()
-            SCREEN.blit(background_img,(0,0))
+            self.game_loop_event()
+            if self.paused:
+                self.pause_menu()
 
-            self.bowman_group.update()
-            self.huskarl_group.update()
-            self.teutonic_group.update()
+            else:
+                
+                
+                # SCREEN.fill()
+                SCREEN.blit(background_img,(0,0))
 
-            self.win_check()
+                self.bowman_group.update()
+                self.huskarl_group.update()
+                self.teutonic_group.update()
+
+                self.win_check()
 
             clock.tick(60)
             pygame.display.update()
@@ -276,7 +313,7 @@ class MAIN:
 
             #Background and Winner text        
             SCREEN.fill((125,125,125))
-            self.check_event()
+            self.main_win_events()
 
             #show winner image
             # !!!!!!!!!!!!!!! Fix img load part !!!!!!!!!
@@ -324,6 +361,19 @@ class MAIN:
             #update and set FPS
             pygame.display.update()
             clock.tick(60)
+
+    def pause_menu(self):
+
+        #Create Transparent Grey rectangle on Background
+        surface = pygame.Surface((WİDTH,HEIGHT), pygame.SRCALPHA)
+        pygame.draw.rect(surface,(120,120,120,10),[0,0,WİDTH,HEIGHT])
+        SCREEN.blit(surface,(0,0))  
+
+        #Button
+        resume_button = Button((WİDTH/2)-180,(HEIGHT/2),150,80,"Resume")
+        resume_button.draw()
+        exit_button = Button((WİDTH/2),(HEIGHT/2),150,80,"Back to Menu")
+        exit_button.draw()
 
 
 
