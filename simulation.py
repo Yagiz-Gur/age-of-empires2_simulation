@@ -1,34 +1,5 @@
 import pygame,sys,random
-
-
-pygame.init()
-WİDTH = 1280
-HEIGHT = 720
-SCREEN = pygame.display.set_mode((WİDTH,HEIGHT))
-clock = pygame.time.Clock()
-
-#define SCALE and max,min Speed
-SCALE=35  
-MAX_SPEED=5
-pygame.font.init()
-TEXT_FONT = pygame.font.SysFont("Arial",35)
-#Spawn Setting
-TOP_SPAWN_AREA = [WİDTH/4, 2*(WİDTH/4), 0, HEIGHT/4]
-RIGHT_SPAWN_AREA = [0,WİDTH/4,HEIGHT/4,3*(HEIGHT/4)]
-LEFT_SPAWN_AREA = [3*(WİDTH/4),WİDTH-SCALE,3*(HEIGHT/4),3*(HEIGHT/4)]
-
-
-#mouse
-
-
-
-#Music Setting  
-pygame.mixer.init()
-pygame.mixer.music.load("Sounds/theme.mp3")
-pygame.mixer.music.play(loops=0,start=10,fade_ms=50000)
-
-background_img = pygame.image.load("Graphics/Backgrounds/background.png").convert()
-background_img = pygame.transform.scale(background_img,(WİDTH,HEIGHT))
+from settings import *
 
 class HUSKARL(pygame.sprite.Sprite):
     def __init__(self):
@@ -86,7 +57,6 @@ class HUSKARL(pygame.sprite.Sprite):
     def chase(self):
         if len(game.bowman_group.sprites()) !=0:
             enemy = min([e for e in game.bowman_group.sprites()], key=lambda e: pow(e.rect.x - self.rect.x, 2) + pow(e.rect.y-self.rect.y, 2))
-            pygame.draw.line(SCREEN,(255,0,0),(self.rect.x,self.rect.y), (enemy.rect.x,enemy.rect.y))
             self.velocity_x = ((enemy.rect.x - self.rect.x)/(abs((enemy.rect.x - self.rect.x))+0.1))* random.randint(1,MAX_SPEED)
             self.velocity_y = ((enemy.rect.y - self.rect.y)/(abs((enemy.rect.y - self.rect.y))+0.1))* random.randint(1,MAX_SPEED)
 
@@ -146,7 +116,6 @@ class BOWMAN(pygame.sprite.Sprite):
     def chase(self):
         if len(game.teutonic_group.sprites()) !=0:
             enemy = min([e for e in game.teutonic_group.sprites()], key=lambda e: pow(e.rect.x - self.rect.x, 2) + pow(e.rect.y-self.rect.y, 2))
-            pygame.draw.line(SCREEN,(255,0,0),(self.rect.x,self.rect.y), (enemy.rect.x,enemy.rect.y))
             self.velocity_x = ((enemy.rect.x - self.rect.x)/(abs((enemy.rect.x - self.rect.x))+0.1))* random.randint(1,MAX_SPEED)
             self.velocity_y = ((enemy.rect.y - self.rect.y)/(abs((enemy.rect.y - self.rect.y))+0.1))* random.randint(1,MAX_SPEED)
 
@@ -198,10 +167,9 @@ class TEUTONIC(pygame.sprite.Sprite):
         SCREEN.blit(self.teutonic_img,self.rect)
     
     def chase(self):
-        # !!!! ADD -> Check whether game.bowman_groups is empty or not
+
         if len(game.huskarl_group.sprites())!= 0:
             enemy = min([e for e in game.huskarl_group.sprites()], key=lambda e: pow(e.rect.x - self.rect.x, 2) + pow(e.rect.y-self.rect.y, 2))
-            pygame.draw.line(SCREEN,(255,0,0),(self.rect.x,self.rect.y), (enemy.rect.x,enemy.rect.y))
             self.velocity_x = ((enemy.rect.x - self.rect.x)/(abs((enemy.rect.x - self.rect.x))+0.1))* random.randint(1,MAX_SPEED)
             self.velocity_y = ((enemy.rect.y - self.rect.y)/(abs((enemy.rect.y - self.rect.y))+0.1))* random.randint(1,MAX_SPEED)
 
