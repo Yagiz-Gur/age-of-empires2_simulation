@@ -13,9 +13,10 @@ MAX_SPEED=5
 pygame.font.init()
 TEXT_FONT = pygame.font.SysFont("Arial",35)
 #Spawn Setting
-TOP_SPAWN_AREA = [WİDTH/4, 3*(WİDTH/4), 0, HEIGHT/4]
+TOP_SPAWN_AREA = [WİDTH/4, 2*(WİDTH/4), 0, HEIGHT/4]
 RIGHT_SPAWN_AREA = [0,WİDTH/4,HEIGHT/4,3*(HEIGHT/4)]
-LEFT_SPAWN_AREA = [3*(WİDTH/4),WİDTH-SCALE,HEIGHT/4,3*(HEIGHT/4)]
+LEFT_SPAWN_AREA = [3*(WİDTH/4),WİDTH-SCALE,3*(HEIGHT/4),3*(HEIGHT/4)]
+
 
 #mouse
 
@@ -129,6 +130,7 @@ class BOWMAN(pygame.sprite.Sprite):
         SCREEN.blit(self.bowman_img,self.rect)       
 
     def move(self):
+        print("df")
         self.rect.x = self.rect.x + self.velocity_x
         self.rect.y = self.rect.y + self.velocity_y
         
@@ -140,6 +142,7 @@ class BOWMAN(pygame.sprite.Sprite):
         #check horizanta border
         if self.rect.y+SCALE> HEIGHT or self.rect.y< 0:
             self.velocity_y= self.velocity_y*-1
+
     def chase(self):
         if len(game.teutonic_group.sprites()) !=0:
             enemy = min([e for e in game.teutonic_group.sprites()], key=lambda e: pow(e.rect.x - self.rect.x, 2) + pow(e.rect.y-self.rect.y, 2))
@@ -434,6 +437,13 @@ class MAIN:
         if exit_button.is_clicked():
             self.paused =0
             self.main_menu()
+
+        #Restart Button 
+        restart_button = Button((WİDTH/2+200),(HEIGHT/2),180,80,"Restart")
+        restart_button.draw()
+        if restart_button.is_clicked():
+            self.paused=False
+            self.game_loop()
 
         #text
         #Huskarl
