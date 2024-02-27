@@ -29,8 +29,6 @@ pygame.mixer.music.play(loops=0,start=10,fade_ms=50000)
 background_img = pygame.image.load("Graphics/Backgrounds/background.png").convert()
 background_img = pygame.transform.scale(background_img,(WİDTH,HEIGHT))
 
-
-
 class HUSKARL(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -46,7 +44,8 @@ class HUSKARL(pygame.sprite.Sprite):
     
         self.velocity_x = random.randint(1,MAX_SPEED)* random.choice([-1,1])
         self.velocity_y = random.randint(1,MAX_SPEED) * random.choice([-1,1])
-          
+
+
     def update(self):
         self.move()
         self.check_border()
@@ -80,8 +79,6 @@ class HUSKARL(pygame.sprite.Sprite):
             self.velocity_x = ((enemy.rect.x - self.rect.x)/(abs((enemy.rect.x - self.rect.x))+0.1))* random.randint(1,MAX_SPEED)
             self.velocity_y = ((enemy.rect.y - self.rect.y)/(abs((enemy.rect.y - self.rect.y))+0.1))* random.randint(1,MAX_SPEED)
 
-
-
 class BOWMAN(pygame.sprite.Sprite):   
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -101,7 +98,7 @@ class BOWMAN(pygame.sprite.Sprite):
     def collide(self):
         pygame.sprite.spritecollide(self,game.teutonic_group,True)
 
-          
+
     def update(self):
         self.move()
         self.check_border()
@@ -130,7 +127,7 @@ class BOWMAN(pygame.sprite.Sprite):
             pygame.draw.line(SCREEN,(255,0,0),(self.rect.x,self.rect.y), (enemy.rect.x,enemy.rect.y))
             self.velocity_x = ((enemy.rect.x - self.rect.x)/(abs((enemy.rect.x - self.rect.x))+0.1))* random.randint(1,MAX_SPEED)
             self.velocity_y = ((enemy.rect.y - self.rect.y)/(abs((enemy.rect.y - self.rect.y))+0.1))* random.randint(1,MAX_SPEED)
- 
+
 class TEUTONIC(pygame.sprite.Sprite):
     def __init__ (self):
         pygame.sprite.Sprite.__init__(self)
@@ -176,6 +173,7 @@ class TEUTONIC(pygame.sprite.Sprite):
             pygame.draw.line(SCREEN,(255,0,0),(self.rect.x,self.rect.y), (enemy.rect.x,enemy.rect.y))
             self.velocity_x = ((enemy.rect.x - self.rect.x)/(abs((enemy.rect.x - self.rect.x))+0.1))* random.randint(1,MAX_SPEED)
             self.velocity_y = ((enemy.rect.y - self.rect.y)/(abs((enemy.rect.y - self.rect.y))+0.1))* random.randint(1,MAX_SPEED)
+
 
 class MAIN:
     def __init__(self):
@@ -224,7 +222,8 @@ class MAIN:
                 if event.button == 1:
                     self.click = True
             
-               
+
+
     def game_loop_event(self):
 
         #mouse pos
@@ -254,20 +253,25 @@ class MAIN:
         menu_bg = pygame.image.load("Graphics/Backgrounds/menu_bg.jpg").convert()
         menu_bg = pygame.transform.scale(menu_bg,(WİDTH,HEIGHT))
         while True:
-             
+
             SCREEN.blit(menu_bg,(0,0))
             self.main_win_events()
             # -- Set button
             # Play Button
-            self.play_button = Button(WİDTH/2,(HEIGHT/2)-90,150,80,"Start",text_color=(250,250,250))
+            self.play_button = Button(WİDTH/2,(HEIGHT/2)-90,150,80,"Start",text_color=(0,25,50))
             self.play_button.draw()
             
             #Exit button
-            self.exit_button = Button((WİDTH/2),(HEIGHT/2),150,80,"Exit",(0,26,58))
+            self.exit_button = Button((WİDTH/2),(HEIGHT/2)+90,150,80,"Exit",(0,25,50))
             self.exit_button.draw()
 
-            #Options
-            
+            #Optinons conversion
+            self.conversion_button = Button((WİDTH/2)-85,(HEIGHT/2),150,80,"Convert",(0,25,50))
+            self.conversion_button.draw()
+            #Options follow
+            self.follow_button = Button((WİDTH/2)+85,(HEIGHT/2),150,80,"Follow",(0,25,50))
+            self.follow_button.draw()
+
 
             # -- Set button action
 
@@ -305,7 +309,7 @@ class MAIN:
 
             clock.tick(60)
             pygame.display.update()
-       
+
     def win_state(self,winner=None):
 
         while True:
@@ -327,7 +331,8 @@ class MAIN:
                 
             if winner == "Longbowman":
                 self.winner_img = pygame.image.load("Graphics/Characters/bowman_blue.png").convert_alpha()
-                
+
+            #winner İmage   
             self.winner_img= pygame.transform.scale(self.winner_img,(SCALE*5,SCALE*5))    
             img_rectangle = self.winner_img.get_rect(center = ((WİDTH/2,HEIGHT/2)))
             
@@ -369,11 +374,34 @@ class MAIN:
         pygame.draw.rect(surface,(120,120,120,10),[0,0,WİDTH,HEIGHT])
         SCREEN.blit(surface,(0,0))  
 
-        #Button
+        #Buttons
+
+        #Resume button
         resume_button = Button((WİDTH/2)-180,(HEIGHT/2),150,80,"Resume")
         resume_button.draw()
-        exit_button = Button((WİDTH/2),(HEIGHT/2),150,80,"Back to Menu")
+        if resume_button.is_clicked():
+            self.paused =0
+        
+        #Exit button
+        exit_button = Button((WİDTH/2),(HEIGHT/2),180,80,"Back to Menu")
         exit_button.draw()
+        if exit_button.is_clicked():
+            self.paused =0
+            self.main_menu()
+
+        #text
+        #Huskarl
+        num_huskarl = len(game.huskarl_group.sprites())
+        huskarl_numbers = TEXT_FONT.render(f"Number of Huskarl: {num_huskarl}",True,(255,0,0) )
+        SCREEN.blit(huskarl_numbers,[25,25,50,50])
+        #Bowman
+        num_bowman = len(game.bowman_group.sprites())
+        bowman_numbers =TEXT_FONT.render(f"Number of Bowman: {num_bowman}",False,(255,0,0))
+        SCREEN.blit(bowman_numbers,[25,60,0,0])
+        #Teutonic
+        num_teutonic = len(game.teutonic_group.sprites())
+        teutonic_numbers = TEXT_FONT.render(f"Number of Teutonic: {num_teutonic}",True,(255,2,0))
+        SCREEN.blit(teutonic_numbers,[25,95,0,0])
 
 
 
