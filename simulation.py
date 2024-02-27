@@ -51,10 +51,20 @@ class HUSKARL(pygame.sprite.Sprite):
         self.check_border()
         self.draw_huskarl()
         self.collide()
-        self.chase()
+        if game.follow:
+            self.chase()
 
     def collide(self):
-        pygame.sprite.spritecollide(self,game.bowman_group,True)
+        if game.conversion:
+            if (pygame.sprite.spritecollide(self,game.bowman_group,False)):
+                collided_items = pygame.sprite.spritecollide(self,game.bowman_group,True)    
+
+                huskarl = HUSKARL()
+                huskarl.rect =huskarl.huskarl_img.get_rect(center = (collided_items[0].rect.x,collided_items[0].rect.y))
+                game.huskarl_group.add(huskarl)
+        else:
+            (pygame.sprite.spritecollide(self,game.bowman_group,True))
+        
     
     def draw_huskarl(self):
         SCREEN.blit(self.huskarl_img,self.rect)
@@ -96,7 +106,15 @@ class BOWMAN(pygame.sprite.Sprite):
         self.velocity_y = random.randint(1,MAX_SPEED) * random.choice([-1,1])
 
     def collide(self):
-        pygame.sprite.spritecollide(self,game.teutonic_group,True)
+        if game.conversion:
+            if (pygame.sprite.spritecollide(self,game.teutonic_group,False)):
+                collided_items = pygame.sprite.spritecollide(self,game.teutonic_group,True)
+
+                bowman = BOWMAN()
+                bowman.rect = bowman.bowman_img.get_rect(center = (collided_items[0].rect.x,collided_items[0].rect.y))
+                game.bowman_group.add(bowman)
+        else:
+            pygame.sprite.spritecollide(self,game.teutonic_group,True)
 
 
     def update(self):
@@ -104,7 +122,8 @@ class BOWMAN(pygame.sprite.Sprite):
         self.check_border()
         self.draw_bowman()
         self.collide()
-        self.chase()
+        if game.follow:
+            self.chase()
     
     def draw_bowman(self):
         SCREEN.blit(self.bowman_img,self.rect)       
@@ -148,10 +167,19 @@ class TEUTONIC(pygame.sprite.Sprite):
         self.check_border()
         self.draw_teutonic()
         self.collision()
-        self.chase()
+        if game.follow:
+            self.chase()
 
     def collision(self):
-        pygame.sprite.spritecollide(self,game.huskarl_group,True)
+        if game.conversion:
+            if (pygame.sprite.spritecollide(self,game.huskarl_group,False)):
+                collided_items = pygame.sprite.spritecollide(self,game.huskarl_group,True)
+
+                teutonic = TEUTONIC()
+                teutonic.rect = teutonic.teutonic_img.get_rect(center = (collided_items[0].rect.x,collided_items[0].rect.y))
+                game.teutonic_group.add(teutonic)
+        else:
+            pygame.sprite.spritecollide(self,game.huskarl_group,True)
     
     def move(self):
         self.rect.x = self.rect.x + self.velocity_x
@@ -180,6 +208,9 @@ class MAIN:
         self.SCALE= 35
         self.text_font =pygame.font.SysFont("Arial",45)
         self.paused = False
+        #Game options
+        self.follow= False
+        self.conversion = False
 
     def win_check(self):
         if len(self.huskarl_group.sprites())==0 and len(self.bowman_group.sprites())==0 :
@@ -229,7 +260,7 @@ class MAIN:
         #mouse pos
         self.Mx, self.My = pygame.mouse.get_pos()
         self.click=False
-
+        
         
         # check interaction 
         for event in pygame.event.get():
@@ -268,9 +299,24 @@ class MAIN:
             #Optinons conversion
             self.conversion_button = Button((WİDTH/2)-85,(HEIGHT/2),150,80,"Convert",(0,25,50))
             self.conversion_button.draw()
+
+            if self.conversion_button.is_clicked():
+                if self.conversion:
+                    self.conversion = False
+                else:
+                    self.conversion =True
             #Options follow
             self.follow_button = Button((WİDTH/2)+85,(HEIGHT/2),150,80,"Follow",(0,25,50))
             self.follow_button.draw()
+
+            if self.follow_button.is_clicked():
+                if self.follow:
+                    self.follow = False
+                    print("true")
+                else:
+                    self.follow = True
+                    print("false")
+
 
 
             # -- Set button action
